@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import ShortURL
 from .serializers import ShortURLSerializer
+from django.shortcuts import get_object_or_404, redirect
 
 def generate_code(length=6):
     characters = string.ascii_letters + string.digits
@@ -26,3 +27,9 @@ class CreateShortURL(APIView):
                 {"short_url": f"http://localhost:8000/shrt/{shorturl.short_code}/"},
                 status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class RedirectShortURL(APIView):
+    def get(self, request, code):
+        short_url = get_object_or_404(ShortURL, short_code=code)
+        return redirect(short_url.original_url)
